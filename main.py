@@ -172,7 +172,7 @@ class SocketConn_Binance(websocket.WebSocketApp):
                                             url=f"https://t.me/+NeaYSIqGPBtmYTNi")
             markup.add(b1, b2)
             markup.add(b3)
-            bot.send_message(-4519723605, txt, parse_mode='HTML', reply_markup=markup)
+            bot.send_message(-1002276541068, txt, parse_mode='HTML', reply_markup=markup)
             print(txt)
 
         for out in data:
