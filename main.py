@@ -43,6 +43,14 @@ class SocketConn_Binance(websocket.WebSocketApp):
         print(error)
         bot = self.bot
         bot.send_message(-4519723605, f'Ошибка:\n\n{error}')
+        self.reconnect()
+
+    def reconnect(self):
+        print('Reconnecting...')
+        bot = self.bot
+        bot.send_message(-4519723605, f'Reconnecting...')
+        time.sleep(5)  # Wait for 5 seconds before reconnecting
+        self.__init__(self.url)
 
     def on_open(self, ws):
         print("Websocket was opened")
@@ -262,6 +270,14 @@ class SocketConn_ByBit(websocket.WebSocketApp):
     def on_errors(self, error):
         print(error)
         self.bot.send_message(-4519723605, f'Ошибка:\n\n{error}')
+        self.reconnect()
+
+    def reconnect(self):
+        print('Reconnecting...')
+        bot = self.bot
+        bot.send_message(-4519723605, f'Reconnecting...')
+        time.sleep(5)  # Wait for 5 seconds before reconnecting
+        self.__init__(self.url)
 
     def on_open(self, ws, ):
         print("Websocket was opened")
