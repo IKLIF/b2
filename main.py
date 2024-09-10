@@ -154,8 +154,8 @@ class SocketConn_Binance(websocket.WebSocketApp):
                       f"👉<b>Interval:</b> 15m")
 
 
-            txt = (f'🟡  <code>{out['symbol']}</code>\n'
-                   f'#Binance  #{out['symbol']}\n\n'
+            txt = (f"🟡  <code>{out['symbol']}</code>\n"
+                   f"#Binance  #{out['symbol']}\n\n"
                    f'{m1}\n\n'
                    f'{m5}\n\n'
                    f'{m15}{price}')
@@ -228,7 +228,7 @@ def sombol_bybit():
     tickers_spot = session.get_tickers(category="linear")
     data_tickers = tickers_spot['result']['list']
 
-    data_tickers = [f'tickers.{i['symbol']}' for i in data_tickers if i['symbol'][-1] == 'T']
+    data_tickers = [f"tickers.{i['symbol']}" for i in data_tickers if i['symbol'][-1] == 'T']
     return data_tickers
 
 class SocketConn_ByBit(websocket.WebSocketApp):
@@ -389,8 +389,8 @@ class SocketConn_ByBit(websocket.WebSocketApp):
                           f"👉<b>Interval:</b> 15m")
 
 
-                txt = (f'⚫️  <code>{out['s']}</code>\n'
-                       f'#Bybit  #{out['s']}\n\n'
+                txt = (f"⚫️  <code>{out['s']}</code>\n"
+                       f"#Bybit  #{out['s']}\n\n"
                        f'{m1}\n\n'
                        f'{m5}\n\n'
                        f'{m15}{price}')
