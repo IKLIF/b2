@@ -5,10 +5,7 @@ import threading
 import json
 import time
 import traceback
-import matplotlib.pyplot as plt
-import csv
 import requests
-import random
 import telebot
 from telebot import types
 from threading import Thread
