@@ -277,7 +277,7 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         bot = self.bot
         bot.send_message(-4519723605, f'Reconnecting...')
         time.sleep(5)  # Wait for 5 seconds before reconnecting
-        self.__init__(self.url)
+        self.__init__(self.url, params=self.params)
 
     def on_open(self, ws, ):
         print("Websocket was opened")
