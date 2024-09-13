@@ -259,6 +259,7 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         self.par_5m = 7
         self.par_15m = 10
 
+        self._5m = None
 
         self.run_forever()
 
@@ -277,7 +278,9 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         bot = self.bot
         bot.send_message(-4519723605, f'Reconnecting...')
         time.sleep(5)  # Wait for 5 seconds before reconnecting
-        self.__init__(self.url, params=self.params)
+        #self.__init__(self.url, params=self.params)
+        params = sombol_bybit()
+        self.__init__(self.url,params=params)
 
     def on_open(self, ws, ):
         print("Websocket was opened")
@@ -301,6 +304,17 @@ class SocketConn_ByBit(websocket.WebSocketApp):
             msg = False
 
         if msg != False:
+            if self._5m == None:
+                bot = self.bot
+                bot.send_message(-4519723605, str(msg))
+                self._5m = msg['t']
+            else:
+                if msg['t'] >= self._5m + (5 * 60000):
+                    bot.send_message(-4519723605, str(msg))
+                    self._5m = msg['t']
+
+
+
             z1 = None
             z2 = None
             z3 = None
