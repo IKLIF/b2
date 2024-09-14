@@ -123,62 +123,62 @@ class SocketConn_Binance(websocket.WebSocketApp):
 
         def OUT(out):
             bot = self.bot
+            if out['symbol'][-1] == 'T':
+                def priceChangePercent(S):
+                    url = "https://fapi.binance.com/fapi/v1/ticker/24hr"
+                    response = requests.get(url, timeout=30)
+                    data_many_f = response.json()
 
-            def priceChangePercent(S):
-                url = "https://fapi.binance.com/fapi/v1/ticker/24hr"
-                response = requests.get(url, timeout=30)
-                data_many_f = response.json()
+                    for coin in data_many_f:
+                        symbol = coin['symbol']
+                        if symbol == S:
+                            return f"\n\n📌<b>Chg % 24h:</b>  <u>{coin['priceChangePercent']}%</u>"
 
-                for coin in data_many_f:
-                    symbol = coin['symbol']
-                    if symbol == S:
-                        return f"\n\n📌<b>Chg % 24h:</b>  <u>{coin['priceChangePercent']}%</u>"
-
-            price = priceChangePercent(out['symbol'])
-
-
-
-            if out['pr'][0] >= 0:
-                m1 = (f"🟩<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
-                      f"👉<b>Interval:</b> 1m")
-            else:
-                m1 = (f"🟥<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
-                      f"👉<b>Interval:</b> 1m")
-
-            if out['pr'][0] >= 0:
-                m5 = (f"🟩<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
-                      f"👉<b>Interval:</b> 5m")
-            else:
-                m5 = (f"🟥<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
-                      f"👉<b>Interval:</b> 5m")
-            if out['pr'][0] >= 0:
-                m15 = (f"🟩<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
-                      f"👉<b>Interval:</b> 15m")
-            else:
-                m15 = (f"🟥<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
-                      f"👉<b>Interval:</b> 15m")
-
-
-            txt = (f"🟡  <code>{out['symbol']}</code>\n"
-                   f"#Binance  #{out['symbol']}\n\n"
-                   f'{m1}\n\n'
-                   f'{m5}\n\n'
-                   f'{m15}{price}')
+                price = priceChangePercent(out['symbol'])
 
 
 
-            markup = types.InlineKeyboardMarkup()
+                if out['pr'][0] >= 0:
+                    m1 = (f"🟩<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
+                          f"👉<b>Interval:</b> 1m")
+                else:
+                    m1 = (f"🟥<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
+                          f"👉<b>Interval:</b> 1m")
 
-            b1 = types.InlineKeyboardButton(text='TV',
-                                            url=f"https://ru.tradingview.com/chart/{out['symbol']}.P")
-            b2 = types.InlineKeyboardButton(text='CG',
-                                            url=f"https://www.coinglass.com/tv/ru/Binance_{out['symbol']}")
-            b3 = types.InlineKeyboardButton(text='ПЕРЕХОД В БОТ',
-                                            url=f"https://t.me/+NeaYSIqGPBtmYTNi")
-            markup.add(b1, b2)
-            markup.add(b3)
-            bot.send_message(-1002276541068, txt, parse_mode='HTML', reply_markup=markup)
-            print(txt)
+                if out['pr'][0] >= 0:
+                    m5 = (f"🟩<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
+                          f"👉<b>Interval:</b> 5m")
+                else:
+                    m5 = (f"🟥<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
+                          f"👉<b>Interval:</b> 5m")
+                if out['pr'][0] >= 0:
+                    m15 = (f"🟩<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
+                          f"👉<b>Interval:</b> 15m")
+                else:
+                    m15 = (f"🟥<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
+                          f"👉<b>Interval:</b> 15m")
+
+
+                txt = (f"🟡  <code>{out['symbol']}</code>\n"
+                       f"#Binance  #{out['symbol']}\n\n"
+                       f'{m1}\n\n'
+                       f'{m5}\n\n'
+                       f'{m15}{price}')
+
+
+
+                markup = types.InlineKeyboardMarkup()
+
+                b1 = types.InlineKeyboardButton(text='TV',
+                                                url=f"https://ru.tradingview.com/chart/{out['symbol']}.P")
+                b2 = types.InlineKeyboardButton(text='CG',
+                                                url=f"https://www.coinglass.com/tv/ru/Binance_{out['symbol']}")
+                b3 = types.InlineKeyboardButton(text='ПЕРЕХОД В БОТ',
+                                                url=f"https://t.me/+NeaYSIqGPBtmYTNi")
+                markup.add(b1, b2)
+                markup.add(b3)
+                bot.send_message(-1002276541068, txt, parse_mode='HTML', reply_markup=markup)
+                print(txt)
 
         for out in data:
             if out['pr'][0] >= self.par_1m or out['pr'][1] >= self.par_5m or out['pr'][2] >= self.par_15m or out['pr'][0] <= -self.par_1m or out['pr'][1] <= -self.par_5m or out['pr'][2] <= -self.par_15m:
@@ -377,70 +377,71 @@ class SocketConn_ByBit(websocket.WebSocketApp):
             def OUT(out):
                 bot = self.bot
 
-                def priceChangePercent(S):
-                    session = HTTP(
-                        testnet=False,
-                        api_key="9kBNn0gpUuXK6s80l4",
-                        api_secret="mZ3SJCj9FOuBQnVNnad3xqtrZZ0tp7aOm7qN",
-                        recv_window=60000
-                    )
+                if out['s'][-1] == 'T':
+                    def priceChangePercent(S):
+                        session = HTTP(
+                            testnet=False,
+                            api_key="9kBNn0gpUuXK6s80l4",
+                            api_secret="mZ3SJCj9FOuBQnVNnad3xqtrZZ0tp7aOm7qN",
+                            recv_window=60000
+                        )
 
-                    # spot
-                    # linear
+                        # spot
+                        # linear
 
-                    tickers_spot = session.get_tickers(category="linear")
-                    data_tickers = tickers_spot['result']['list']
+                        tickers_spot = session.get_tickers(category="linear")
+                        data_tickers = tickers_spot['result']['list']
 
-                    for i in data_tickers:
-                        if i['symbol'] == S:
-                            return f"\n\n📌<b>Chg % 24h:</b>  <u>{round(float(i['price24hPcnt'])*100,3)}%</u>"
+                        for i in data_tickers:
+                            if i['symbol'] == S:
+                                return f"\n\n📌<b>Chg % 24h:</b>  <u>{round(float(i['price24hPcnt'])*100,3)}%</u>"
 
-                price = priceChangePercent(out['s'])
+                    price = priceChangePercent(out['s'])
 
-                if price == None:
-                    price = ''
+                    if price == None:
+                        price = ''
 
-                if out['pr'][0] >= 0:
-                    m1 = (f"🟩<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
-                          f"👉<b>Interval:</b> 1m")
-                else:
-                    m1 = (f"🟥<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
-                          f"👉<b>Interval:</b> 1m")
+                    if out['pr'][0] >= 0:
+                        m1 = (f"🟩<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
+                              f"👉<b>Interval:</b> 1m")
+                    else:
+                        m1 = (f"🟥<b>Price change:</b>  <u>{out['pr'][0]}%</u>\n"
+                              f"👉<b>Interval:</b> 1m")
 
-                if out['pr'][0] >= 0:
-                    m5 = (f"🟩<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
-                          f"👉<b>Interval:</b> 5m")
-                else:
-                    m5 = (f"🟥<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
-                          f"👉<b>Interval:</b> 5m")
-                if out['pr'][0] >= 0:
-                    m15 = (f"🟩<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
-                          f"👉<b>Interval:</b> 15m")
-                else:
-                    m15 = (f"🟥<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
-                          f"👉<b>Interval:</b> 15m")
-
-
-                txt = (f"⚫️  <code>{out['s']}</code>\n"
-                       f"#Bybit  #{out['s']}\n\n"
-                       f'{m1}\n\n'
-                       f'{m5}\n\n'
-                       f'{m15}{price}')
+                    if out['pr'][0] >= 0:
+                        m5 = (f"🟩<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
+                              f"👉<b>Interval:</b> 5m")
+                    else:
+                        m5 = (f"🟥<b>Price change:</b>  <u>{out['pr'][1]}%</u>\n"
+                              f"👉<b>Interval:</b> 5m")
+                    if out['pr'][0] >= 0:
+                        m15 = (f"🟩<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
+                              f"👉<b>Interval:</b> 15m")
+                    else:
+                        m15 = (f"🟥<b>Price change:</b>  <u>{out['pr'][2]}%</u>\n"
+                              f"👉<b>Interval:</b> 15m")
 
 
+                    txt = (f"⚫️  <code>{out['s']}</code>\n"
+                           f"#Bybit  #{out['s']}\n\n"
+                           f'{m1}\n\n'
+                           f'{m5}\n\n'
+                           f'{m15}{price}')
 
-                markup = types.InlineKeyboardMarkup()
 
-                b1 = types.InlineKeyboardButton(text='TV',
-                                                url=f"https://ru.tradingview.com/chart/{out['s']}.P")
-                b2 = types.InlineKeyboardButton(text='CG',
-                                                url=f"https://www.coinglass.com/tv/ru/Bybit_{out['s']}")
-                b3 = types.InlineKeyboardButton(text='ПЕРЕХОД В БОТ',
-                                                url=f"https://t.me/+NeaYSIqGPBtmYTNi")
-                markup.add(b1, b2)
-                markup.add(b3)
-                bot.send_message(-1002276541068, txt, parse_mode='HTML', reply_markup=markup)
-                print(txt)
+
+                    markup = types.InlineKeyboardMarkup()
+
+                    b1 = types.InlineKeyboardButton(text='TV',
+                                                    url=f"https://ru.tradingview.com/chart/{out['s']}.P")
+                    b2 = types.InlineKeyboardButton(text='CG',
+                                                    url=f"https://www.coinglass.com/tv/ru/Bybit_{out['s']}")
+                    b3 = types.InlineKeyboardButton(text='ПЕРЕХОД В БОТ',
+                                                    url=f"https://t.me/+NeaYSIqGPBtmYTNi")
+                    markup.add(b1, b2)
+                    markup.add(b3)
+                    bot.send_message(-1002276541068, txt, parse_mode='HTML', reply_markup=markup)
+                    print(txt)
 
             have_3m = True
             if data['pr'] != [None, None, None]:
