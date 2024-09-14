@@ -260,6 +260,7 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         self.par_15m = 10
 
         self._5m = None
+        self._5msum = 0
 
         self.run_forever()
 
@@ -304,13 +305,17 @@ class SocketConn_ByBit(websocket.WebSocketApp):
             msg = False
 
         if msg != False:
+            self._5msum += 1
+
             if self._5m == None:
                 bot = self.bot
-                bot.send_message(-4519723605, str(msg))
+                bot.send_message(-4519723605, str(self._5msum))
+                self._5msum = 0
                 self._5m = msg['t']
             else:
                 if msg['t'] >= self._5m + (5 * 60000):
-                    bot.send_message(-4519723605, str(msg))
+                    bot.send_message(-4519723605, str(self._5msum))
+                    self._5msum = 0
                     self._5m = msg['t']
 
 
