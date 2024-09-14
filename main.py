@@ -261,6 +261,7 @@ class SocketConn_ByBit(websocket.WebSocketApp):
 
         self._5m = None
         self._5msum = 0
+        self._5msumall = 0
 
         self.run_forever()
 
@@ -297,6 +298,8 @@ class SocketConn_ByBit(websocket.WebSocketApp):
     def message(self, msg):
         bot = self.bot
         msg = json.loads(msg)
+
+        self._5msumall += 1
         try:
             msg = {'s':msg['data']['symbol'],'p':msg['data']['lastPrice'], 't':int(msg['ts'])}
             if msg['s'][-1] != 'T':
@@ -304,19 +307,23 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         except Exception as e:
             msg = False
 
+        if self._5m == None:
+                bot = self.bot
+                ttxt = str(self._5msumall) + ':' + str(self._5msum)
+                bot.send_message(-4519723605, ttxt)
+                self._5msum = 0
+                self._5msumall = 0
+                self._5m = msg['t']
+        else:
+                if msg['t'] >= self._5m + (5 * 60000):
+                    ttxt = str(self._5msumall) + ':' + str(self._5msum)
+                    bot.send_message(-4519723605, ttxt)
+                    self._5msum = 0
+                    self._5msumall = 0
+                    self._5m = msg['t']
+
         if msg != False:
             self._5msum += 1
-
-            if self._5m == None:
-                bot = self.bot
-                bot.send_message(-4519723605, str(self._5msum))
-                self._5msum = 0
-                self._5m = msg['t']
-            else:
-                if msg['t'] >= self._5m + (5 * 60000):
-                    bot.send_message(-4519723605, str(self._5msum))
-                    self._5msum = 0
-                    self._5m = msg['t']
 
 
 
