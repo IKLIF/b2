@@ -307,20 +307,21 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         except Exception as e:
             msg = False
 
+        ttt = int(time.time()) * 1000
         if self._5m == None:
                 bot = self.bot
                 ttxt = str(self._5msumall) + ':' + str(self._5msum)
                 bot.send_message(-4519723605, ttxt)
                 self._5msum = 0
                 self._5msumall = 0
-                self._5m = msg['t']
+                self._5m = ttt
         else:
-                if msg['t'] >= self._5m + (5 * 60000):
+                if ttt >= self._5m + (5 * 60000):
                     ttxt = str(self._5msumall) + ':' + str(self._5msum)
                     bot.send_message(-4519723605, ttxt)
                     self._5msum = 0
                     self._5msumall = 0
-                    self._5m = msg['t']
+                    self._5m = ttt
 
         if msg != False:
             self._5msum += 1
