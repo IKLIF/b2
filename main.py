@@ -11,6 +11,9 @@ from telebot import types
 from threading import Thread
 
 
+Binance_ = None
+Bybit_ = None
+
 class SocketConn_Binance(websocket.WebSocketApp):
     def __init__(self, url):
         super().__init__(url=url, on_open=self.on_open)
@@ -212,6 +215,10 @@ class SocketConn_Binance(websocket.WebSocketApp):
             self.ist_15m.pop(0)
             self.ist_15m.pop(0)
 
+        global Binance_
+        t = time.time()
+        Binance_ = t
+        return Binance_
 
 
 
@@ -259,10 +266,6 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         self.par_5m = 7
         self.par_15m = 10
 
-        self._5m = None
-        self._5msum = 0
-        self._5msumall = 0
-
         self.run_forever()
 
     def on_closes(self,txt):
@@ -299,7 +302,6 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         bot = self.bot
         msg = json.loads(msg)
 
-        self._5msumall += 1
         try:
             msg = {'s':msg['data']['symbol'],'p':msg['data']['lastPrice'], 't':int(msg['ts'])}
             if msg['s'][-1] != 'T':
@@ -307,26 +309,7 @@ class SocketConn_ByBit(websocket.WebSocketApp):
         except Exception as e:
             msg = False
 
-        ttt = int(time.time()) * 1000
-        if self._5m == None:
-                bot = self.bot
-                ttxt = str(self._5msumall) + ':' + str(self._5msum)
-                bot.send_message(-4519723605, ttxt)
-                self._5msum = 0
-                self._5msumall = 0
-                self._5m = ttt
-        else:
-                if ttt >= self._5m + (5 * 60000):
-                    ttxt = str(self._5msumall) + ':' + str(self._5msum)
-                    bot.send_message(-4519723605, ttxt)
-                    self._5msum = 0
-                    self._5msumall = 0
-                    self._5m = ttt
-
         if msg != False:
-            self._5msum += 1
-
-
 
             z1 = None
             z2 = None
@@ -468,6 +451,10 @@ class SocketConn_ByBit(websocket.WebSocketApp):
                         OUT(data)
                         self._3m.append(data)
 
+            global Bybit_
+            t = time.time()
+            Bybit_ = t
+            return Bybit_
 
 
 def st_binance():
@@ -485,12 +472,59 @@ def st_bybit():
         time.sleep(5)
         sombol_bybit()
 
+def Manager():
+    API = '7511332625:AAFK_c_cU2jPo8Ru5Xruo5WUnqLOWiSXqLQ'
+    bot = telebot.TeleBot(API)#-4519723605
+
+    def mass(txt):
+        bot.send_message(-4519723605, txt)
+
+    mass('MANAGER: ✅\nACTIVATED')
+
+    while True:
+        time.sleep(300)
+
+        txt = 'Отчет за 5 минут:\n\n'
+
+        t = time.time()
+
+        BI = False
+        BY = False
+        global Binance_
+        global Bybit_
+
+        if t > Binance_ + (5 * 60):
+            txt = f'{txt}Binance:🛑👉💩ERROR💩'
+            BI = True
+        else:
+            txt = f'{txt}Binance:✅👉GOOD 👍'
+        if t > Bybit_ + (5 * 60):
+            txt = f'{txt}\n\nByBit:🛑👉💩ERROR💩'
+            BY = True
+        else:
+            txt = f'{txt}\n\nByBit:✅👉GOOD 👍'
+
+        mass(txt)
+
+        if BI:
+            mass('🛑Binance не отвечает\n👉 больше 5 минут🛑')
+            mass('Reconnecting...')
+            st_binance()
+        if BY:
+            mass('🛑Bybit не отвечает\n👉 больше 5 минут🛑')
+            mass('Reconnecting...')
+            st_bybit()
+
+
+
 
 def GO():
     Binance = Thread(target=st_binance)
     Binance.start()
     bybit = Thread(target=st_bybit)
     bybit.start()
+    Manager_ = Thread(target=Manager)
+    Manager_.start()
 
 
 
